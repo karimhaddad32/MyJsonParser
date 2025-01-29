@@ -1,0 +1,69 @@
+{
+  "company": {
+    "name": "TechCorp",
+    "industry": "Software",
+    "location": {
+      "address": "1234 Tech Ave",
+      "city": "Silicon Valley",
+      "state": "CA",
+      "zipcode": "94043"
+    },
+    "employees": [
+      {
+        "id": 101,
+        "name": "John Doe",
+        "position": "Software Engineer",
+        "salary": 120000,
+        "hireDate": "2015-06-01",
+        "isActive": true
+      },
+      {
+        "id": 102,
+        "name": "Jane Smith",
+        "position": "Product Manager",
+        "salary": 110000,
+        "hireDate": "2017-09-15",
+        "isActive": true
+      },
+      {
+        "id": 103,
+        "name": "Samuel Green",
+        "position": "UX Designer",
+        "salary": 90000,
+        "hireDate": "2020-03-10",
+        "isActive": false
+      }
+    ],
+    "projects": [
+      {
+        "projectId": "A123",
+        "name": "Mobile App",
+        "budget": 500000,
+        "deadline": "2025-12-31",
+        "status": "Active"
+      },
+      {
+        "projectId": "B456",
+        "name": "Cloud Infrastructure",
+        "budget": 300000,
+        "deadline": "2024-08-15",
+        "status": "Completed"
+      }
+    ]
+  },
+  "global": {
+    "employees": 2500,
+    "offices": [
+      {
+        "officeId": 1,
+        "city": "New York",
+        "employees": 500
+      },
+      {
+        "officeId": 2,
+        "city": "London",
+        "employees": 400
+      }
+    ]
+  }
+}

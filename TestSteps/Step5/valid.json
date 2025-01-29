@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1,
+    "name": "Alice",
+    "age": 34,
+    "email": "alice@example.com",
+    "isActive": true,
+    "address": {
+      "street": "123 Maple St",
+      "city": "Springfield",
+      "state": "IL",
+      "zipcode": "62701"
+    },
+    "friends": [
+      {
+        "id": 2,
+        "name": "Bob",
+        "age": 30,
+        "email": "bob@example.com"
+      },
+      {
+        "id": 3,
+        "name": "Charlie",
+        "age": 28,
+        "email": "charlie@example.com"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "David",
+    "age": 45,
+    "email": "david@example.com",
+    "isActive": false,
+    "address": {
+      "street": "456 Oak St",
+      "city": "Madison",
+      "state": "WI",
+      "zipcode": "53703"
+    },
+    "friends": [
+      {
+        "id": 5,
+        "name": "Eve",
+        "age": 25,
+        "email": "eve@example.com"
+      },
+      {
+        "id": 6,
+        "name": "Frank",
+        "age": 50,
+        "email": "frank@example.com"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Grace",
+    "age": 60,
+    "email": "grace@example.com",
+    "isActive": true,
+    "address": {
+      "street": "789 Birch St",
+      "city": "Chicago",
+      "state": "IL",
+      "zipcode": "60601"
+    },
+    "friends": [
+      {
+        "id": 8,
+        "name": "Hank",
+        "age": 62,
+        "email": "hank@example.com"
+      },
+      {
+        "id": 9,
+        "name": "Ivy",
+        "age": 40,
+        "email": "ivy@example.com"
+      }
+    ]
+  }
+]
