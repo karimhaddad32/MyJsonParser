@@ -226,6 +226,8 @@ namespace MyJsonParser
                 {
                     arrayClosed = true;
                     i++;
+                    i += CleanRestOfSpaces(input, i);
+
                     break;
                 }
 
@@ -286,7 +288,7 @@ namespace MyJsonParser
                     return (str, i - position + inc);
                 }
 
-                if (IsNumerical(indexCharacter))
+                if (IsDigitsOrSigns(indexCharacter))
                 {
                     var(num, inc) = ParseNumber(input, i);
                     return (num, i - position + inc);
@@ -319,6 +321,8 @@ namespace MyJsonParser
             throw new InvalidOperationException($"unknown character {input[i]}");
         }
 
+       
+
         private static (object? nullVal, int inc) TryParseExactValue(string input, int position, string exactValue)
         {
             int i = position;
@@ -343,7 +347,12 @@ namespace MyJsonParser
 
         private static bool IsNumerical(char indexCharacter)
         {
-            return indexCharacter is '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' or '0';
+            return indexCharacter is '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' or '0' or 'e' or 'E' or '-' or '.' or '+';
+        }
+
+        private static bool IsDigitsOrSigns(char indexCharacter)
+        {
+            return indexCharacter is '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' or '0' or '-' or '+';
         }
 
         private static (object?, int) ParseNumber(string input, int position)
@@ -356,10 +365,14 @@ namespace MyJsonParser
                 number += input[i++];
             }
 
-            if (number.Trim().StartsWith("0") && !number.Trim().StartsWith("0.")) {
+            if (number.Trim().Length > 1 &&  number.Trim().StartsWith("0") && !number.Trim().StartsWith("0.")) {
                 throw new InvalidOperationException("Invalid Number");
             }
 
+            if (number.Contains('.') || number.Contains('E') || number.Contains('e'))
+            {
+                return (double.Parse(number), i - position);
+            }
             return (int.Parse(number), i - position);
         }
 
