@@ -202,6 +202,12 @@ namespace MyJsonParser
             {
                 var indexedCharacter = input[i];
 
+                if (indexedCharacter is ' ' or '\n')
+                {
+                    i++;
+                    continue;
+                }
+
                 if (indexedCharacter is ']')
                 {
                     arrayClosed = true;
@@ -209,17 +215,16 @@ namespace MyJsonParser
                     break;
                 }
 
-                if (indexedCharacter is ',')
+                if (indexedCharacter is ',' && list.Count > 0)
                 {
                     commaFoundWithoutClosing = true;
                     i++;
                     continue;
                 }
 
-                if (indexedCharacter is ' ' or '\n')
+                if (indexedCharacter is ',' && list.Count == 0)
                 {
-                    i++;
-                    continue;
+                    throw new InvalidOperationException("Invalid Array");
                 }
 
                 commaFoundWithoutClosing = false;
