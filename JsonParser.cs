@@ -11,7 +11,7 @@ namespace MyJsonParser
 
             try
             {
-                (jsonObject, int position) = JsonParser.InternalParse(input, 0);
+                (jsonObject, int position) = JsonParser.InternalParse(input, 0, 0);
 
                 if (position < input.Length) {
                     throw new InvalidOperationException();
@@ -26,7 +26,7 @@ namespace MyJsonParser
             return true;
         }
 
-        private static (object? JsonObject, int) InternalParse(string input, int position)
+        private static (object? JsonObject, int) InternalParse(string input, int position, int deepness)
         {
             int i = position;
 
@@ -43,7 +43,7 @@ namespace MyJsonParser
                         var (result, inc) = ParseObject(input, i);
                         return (result, i - position + inc);
                     case '[':
-                        var (arrResult, arrInc) = ParseArray(input, i);
+                        var (arrResult, arrInc) = ParseArray(input, i, deepness);
                         return (arrResult, i - position + arrInc);
                     default:
                         throw new InvalidOperationException();
@@ -108,7 +108,10 @@ namespace MyJsonParser
                 throw new InvalidOperationException($"Character {input[i]}");
             }
 
-
+            if (commaFoundWithoutClosing)
+            {
+                throw new InvalidOperationException("syntax error. Comma found in a wrong position");
+            }
 
             return (result, i - position);
         }
@@ -147,7 +150,7 @@ namespace MyJsonParser
 
             i++;
 
-            var (value, valueInc) = ParseValue(input, i);
+            var (value, valueInc) = ParseValue(input, i, 0);
             i += valueInc;
 
             return (key, value, i - position);
@@ -165,6 +168,11 @@ namespace MyJsonParser
                 {
                     i++;
                     break;
+                }
+
+                if (input[i] is '\\' or '\t' or '\n')
+                {
+                    throw new InvalidOperationException("Invalid Token");
                 }
 
                 keyVal += input[i++];
@@ -189,9 +197,15 @@ namespace MyJsonParser
             return (keyVal, i - position);
         }
 
-        private static (object?[], int) ParseArray(string input, int position)
+        private static (object?[], int) ParseArray(string input, int position, int initialDeepness)
         {
             int i = position + 1;
+            int deepness = 1 + initialDeepness;
+
+            if(deepness >= 20)
+            {
+                throw new InvalidOperationException("Array Too Deep!");
+            }
 
             var list = new List<object?>();
 
@@ -229,7 +243,7 @@ namespace MyJsonParser
 
                 commaFoundWithoutClosing = false;
 
-                var (valueObj, inc) = ParseValue(input, i);
+                var (valueObj, inc) = ParseValue(input, i, deepness);
                 list.Add(valueObj);
                 i += inc; 
             }
@@ -242,7 +256,7 @@ namespace MyJsonParser
             return (list.ToArray(), i - position);
         }
 
-        private static (object?, int) ParseValue(string input, int position)
+        private static (object?, int) ParseValue(string input, int position, int deepness)
         {
             int i = position;
 
@@ -262,7 +276,7 @@ namespace MyJsonParser
 
                 if ((indexCharacter is '{' or '['))
                 {
-                    var (valResult, valInc) = InternalParse(input, i);
+                    var (valResult, valInc) = InternalParse(input, i, deepness);
                     return (valResult, i - position + valInc);
                 }
 
@@ -272,7 +286,7 @@ namespace MyJsonParser
                     return (str, i - position + inc);
                 }
 
-                if (IsDigit(indexCharacter))
+                if (IsNumerical(indexCharacter))
                 {
                     var(num, inc) = ParseNumber(input, i);
                     return (num, i - position + inc);
@@ -327,7 +341,7 @@ namespace MyJsonParser
             return (null, i - position);
         }
 
-        private static bool IsDigit(char indexCharacter)
+        private static bool IsNumerical(char indexCharacter)
         {
             return indexCharacter is '1' or '2' or '3' or '4' or '5' or '6' or '7' or '8' or '9' or '0';
         }
@@ -337,9 +351,13 @@ namespace MyJsonParser
             int i = position;
             string number = "";
 
-            while (i < input.Length && IsDigit(input[i]))
+            while (i < input.Length && IsNumerical(input[i]))
             {
                 number += input[i++];
+            }
+
+            if (number.Trim().StartsWith("0") && !number.Trim().StartsWith("0.")) {
+                throw new InvalidOperationException("Invalid Number");
             }
 
             return (int.Parse(number), i - position);
