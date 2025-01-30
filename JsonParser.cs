@@ -1,7 +1,4 @@
 ﻿
-
-using System;
-
 namespace MyJsonParser
 {
     internal class JsonParser
@@ -15,7 +12,6 @@ namespace MyJsonParser
             try
             {
                 jsonObject = JsonParser.InternalParse(input, 0).JsonObject;
-                Console.WriteLine(jsonObject);
             }
             catch(Exception e)
             {
@@ -231,8 +227,6 @@ namespace MyJsonParser
                     return (false, i - position + 5);
                 }
 
-                Console.WriteLine(input.Substring(0, i));
-
                 throw new InvalidOperationException($"unknown character {indexCharacter}");
             }
 
@@ -277,6 +271,51 @@ namespace MyJsonParser
             }
 
             return (int.Parse(number), i - position);
+        }
+
+        internal static Dictionary<string, object?>? ToDictionary(object? jsonObject)
+        {
+            return jsonObject as Dictionary<string, object?>;
+        }
+
+        internal static T ToClass<T>(object? jsonObject) where T : new()
+        {
+            var dict = ToDictionary(jsonObject);
+
+            if (dict == null) return new();
+
+            T obj = new();
+
+            foreach (var property in typeof(T).GetProperties())
+            {
+                if (dict.ContainsKey(property.Name))
+                {
+                    // Check if the property type matches the value type in the dictionary
+                    property.SetValue(obj, Convert.ChangeType(dict[property.Name], property.PropertyType));
+                }
+            }
+            return obj;
+        }
+
+        internal static T[]? ToClassArray<T>(object? jsonObject) where T : new()
+        {
+            var array = ToJsonArray(jsonObject);
+
+            if (array == null) return default;
+
+            List<T?> result = [];
+
+            foreach(var item in array)
+            {
+                result.Add(ToClass<T>(item));
+            }
+      
+            return [.. result];
+        }
+
+        internal static object?[]? ToJsonArray(object? jsonArray)
+        {
+            return jsonArray as object?[];
         }
     }
 }

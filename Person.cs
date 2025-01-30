@@ -65,23 +65,12 @@
 
 //Once you’re confident your parser is done and well tested you can try running it against the test suite here: http://www.json.org/JSON_checker/test.zip
 
-using MyJsonParser;
+public class Person
+{
+    public string name { get; set; }
 
-string jsonString = "{\"name\": \"John\", \"age\": 30, \"city\": \"New York\"}";
+    public int age { get; set; }
 
-JsonParser.TryParse(jsonString, out var jsonObject);
-
-var person = JsonParser.ToClass<Person>(jsonObject) ?? throw new ArgumentException("Invalid Json Object");
-
-Console.WriteLine($"Name: {person.name}, Age: {person.age}, City: {person.city}");
-
-
-string jsonArrayString = "[{\"name\": \"John\", \"age\": 30, \"city\": \"New York\"},{\"name\": \"Jane\", \"age\": 25, \"city\": \"Montreal\"}]";
-
-JsonParser.TryParse(jsonArrayString, out var jsonArray);
-
-var personList = JsonParser.ToClassArray<Person>(jsonArray) ?? throw new ArgumentException("Invalid Json Object");
-
-foreach(var p in personList) {
-    Console.WriteLine($"Name: {p.name}, Age: {p.age}, City: {p.city}");
+    public string city { get; set; }
 }
+
