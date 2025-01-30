@@ -11,7 +11,11 @@ namespace MyJsonParser
 
             try
             {
-                jsonObject = JsonParser.InternalParse(input, 0).JsonObject;
+                (jsonObject, int position) = JsonParser.InternalParse(input, 0);
+
+                if (position < input.Length) {
+                    throw new InvalidOperationException();
+                }
             }
             catch(Exception e)
             {
@@ -32,7 +36,7 @@ namespace MyJsonParser
 
                 switch (indexCharacter)
                 {
-                    case ' ' or ',' or '\n':
+                    case ' ' or '\n':
                         i++;
                         continue;
                     case '{':
@@ -41,10 +45,8 @@ namespace MyJsonParser
                     case '[':
                         var (arrResult, arrInc) = ParseArray(input, i);
                         return (arrResult, i - position + arrInc);
-
-                    default:                    
-                        var (valResult, valInc) = ParseValue(input, i);
-                        return (valResult, i - position + valInc);
+                    default:
+                        throw new InvalidOperationException();
 
                 }
             }
@@ -77,6 +79,7 @@ namespace MyJsonParser
                 if (indexCharacter is '}' && !commaFoundWithoutClosing)
                 {
                     i++;
+                    i += CleanRestOfSpaces(input, i);
                     break;
                 }
 
@@ -84,6 +87,7 @@ namespace MyJsonParser
                 if (indexCharacter is ']')
                 {
                     i++;
+                    i += CleanRestOfSpaces(input, i);
                     break;
                 }
 
@@ -104,7 +108,25 @@ namespace MyJsonParser
                 throw new InvalidOperationException($"Character {input[i]}");
             }
 
+
+
             return (result, i - position);
+        }
+
+        private static int CleanRestOfSpaces(string input, int position)
+        {
+            int i = position;
+            while(i < input.Length)
+            {
+                if (input[i] is ' ' or '\n')
+                {
+                    i++;
+                }
+
+                break;
+            }
+
+            return i - position;
         }
 
         private static (string key, object? objectVal, int increment) ParseObjectProperty(string input, int position)
@@ -125,7 +147,7 @@ namespace MyJsonParser
 
             i++;
 
-            var (value, valueInc) = InternalParse(input, i);
+            var (value, valueInc) = ParseValue(input, i);
             i += valueInc;
 
             return (key, value, i - position);
@@ -148,6 +170,22 @@ namespace MyJsonParser
                 keyVal += input[i++];
             }
 
+            while(i < input.Length)
+            {
+                if (input[i] is ' ' or '\n')
+                {
+                    i++;
+                    continue;
+                }
+
+                if (input[i] is '}' or ']' or ',' or ':')
+                {
+                    break;
+                }
+
+                i++;
+            }
+
             return (keyVal, i - position);
         }
 
@@ -157,25 +195,43 @@ namespace MyJsonParser
 
             var list = new List<object?>();
 
-            while(i < input.Length)
+            bool arrayClosed = false;
+            var commaFoundWithoutClosing = false;
+
+            while (i < input.Length)
             {
                 var indexedCharacter = input[i];
 
                 if (indexedCharacter is ']')
                 {
+                    arrayClosed = true;
                     i++;
                     break;
                 }
 
-                if (indexedCharacter is ',' or ' ' or '\n')
+                if (indexedCharacter is ',')
+                {
+                    commaFoundWithoutClosing = true;
+                    i++;
+                    continue;
+                }
+
+                if (indexedCharacter is ' ' or '\n')
                 {
                     i++;
                     continue;
                 }
 
-                var (valueObj, inc) = InternalParse(input, i);
+                commaFoundWithoutClosing = false;
+
+                var (valueObj, inc) = ParseValue(input, i);
                 list.Add(valueObj);
                 i += inc; 
+            }
+
+            if (!arrayClosed || commaFoundWithoutClosing)
+            {
+                throw new InvalidOperationException("Invalid Array");
             }
 
             return (list.ToArray(), i - position);
@@ -189,9 +245,20 @@ namespace MyJsonParser
             {
                 var indexCharacter = input[i];
 
+                if(indexCharacter is ',')
+                {
+                    throw new InvalidOperationException("Invalid Array");
+                }
+
                 if (indexCharacter is ' ' or '\n' or '\t') {
                     i++;
                     continue;
+                }
+
+                if ((indexCharacter is '{' or '['))
+                {
+                    var (valResult, valInc) = InternalParse(input, i);
+                    return (valResult, i - position + valInc);
                 }
 
                 if (indexCharacter == '"')

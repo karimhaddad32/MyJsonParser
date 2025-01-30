@@ -33,8 +33,7 @@ namespace MyJsonParser
         [InlineData(" 56 ", 56)]
         public void ParseNumber(string valueType, int expected)
         {
-            JsonParser.TryParse(valueType, out var result).Should().BeTrue();
-            result.As<int>().Should().Be(expected);
+            JsonParser.TryParse(valueType, out var result).Should().BeFalse();
         }
 
         [Theory]
@@ -175,14 +174,66 @@ namespace MyJsonParser
         }
 
         [Theory]
-        [InlineData("TestSteps/Step5/valid.json")]
-        [InlineData("TestSteps/Step5/valid2.json")]
-        public void ParseValidJsonStep5(string filePath)
+        [InlineData("TestSteps/Step6/valid.json")]
+        [InlineData("TestSteps/Step6/valid2.json")]
+        public void ParseValidJsonStep6(string filePath)
         {
             string content = File.ReadAllText(filePath);
 
             JsonParser.TryParse(content, out var result).Should().BeTrue();
             result.Should().NotBeNull();
+        }
+
+        [Theory]
+        [InlineData("TestSteps/Step5/fail1.json")]
+        [InlineData("TestSteps/Step5/fail2.json")]
+        [InlineData("TestSteps/Step5/fail3.json")]
+        [InlineData("TestSteps/Step5/fail4.json")]
+        [InlineData("TestSteps/Step5/fail5.json")]
+        [InlineData("TestSteps/Step5/fail6.json")]
+        [InlineData("TestSteps/Step5/fail7.json")]
+        [InlineData("TestSteps/Step5/fail8.json")]
+        [InlineData("TestSteps/Step5/fail9.json")]
+        [InlineData("TestSteps/Step5/fail10.json")]
+        [InlineData("TestSteps/Step5/fail11.json")]
+        [InlineData("TestSteps/Step5/fail12.json")]
+        [InlineData("TestSteps/Step5/fail13.json")]
+        [InlineData("TestSteps/Step5/fail14.json")]
+        [InlineData("TestSteps/Step5/fail15.json")]
+        [InlineData("TestSteps/Step5/fail16.json")]
+        [InlineData("TestSteps/Step5/fail17.json")]
+        [InlineData("TestSteps/Step5/fail18.json")]
+        [InlineData("TestSteps/Step5/fail19.json")]
+        [InlineData("TestSteps/Step5/fail20.json")]
+        [InlineData("TestSteps/Step5/fail21.json")]
+        [InlineData("TestSteps/Step5/fail22.json")]
+        [InlineData("TestSteps/Step5/fail23.json")]
+        [InlineData("TestSteps/Step5/fail24.json")]
+        [InlineData("TestSteps/Step5/fail25.json")]
+        [InlineData("TestSteps/Step5/fail26.json")]
+        [InlineData("TestSteps/Step5/fail27.json")]
+        [InlineData("TestSteps/Step5/fail28.json")]
+        [InlineData("TestSteps/Step5/fail29.json")]
+        [InlineData("TestSteps/Step5/fail30.json")]
+        [InlineData("TestSteps/Step5/fail31.json")]
+        [InlineData("TestSteps/Step5/fail32.json")]
+        [InlineData("TestSteps/Step5/fail33.json")]
+        public void ParseInValidJsonStep5(string filePath)
+        {
+            string content = File.ReadAllText(filePath);
+
+            JsonParser.TryParse(content, out var result).Should().BeFalse();
+        }
+
+        [Theory]
+        [InlineData("TestSteps/Step5/pass1.json")]
+        [InlineData("TestSteps/Step5/pass2.json")]
+        [InlineData("TestSteps/Step5/pass3.json")]
+        public void ParseValidJsonStep5(string filePath)
+        {
+            string content = File.ReadAllText(filePath);
+
+            JsonParser.TryParse(content, out var result).Should().BeTrue();
         }
 
 
