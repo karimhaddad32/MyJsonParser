@@ -225,19 +225,33 @@ namespace MyJsonParser
             return (keyVal, i - position);
         }
 
-        private static object GetHex(string hex, out int increment)
+        private static string GetHex(string hex, out int increment)
         {
-            const string hexChars = "0123456789ABCDEFabcdef";
             for(int i = 0; i< hex.Length; i++)
             {
-                if (!hexChars.Contains(hex[i]))
+                if (IsDigit(hex[i]) || IsSmallLetterHex(hex[i]) || IsCapitalLetterHex(hex[i]))
                 {
-                    throw new InvalidOperationException("Invalid Hex with escape Character!");
+                    increment = 6;
+                    return hex;
                 }
             }
 
-            increment = 6;
-            return hex;
+            throw new InvalidOperationException("Invalid Hex with escape Character!");
+        }
+
+        private static bool IsCapitalLetterHex(char c)
+        {
+            return (c >= 'A' && c <= 'F');
+        }  
+        
+        private static bool IsSmallLetterHex(char c)
+        {
+            return (c >= 'a' && c <= 'f');
+        }
+
+        private static bool IsDigit(char c)
+        {
+            return c >= '0' && c <= '9';
         }
 
         private static (object?[], int) ParseArray(string input, int position, int initialDeepness)
