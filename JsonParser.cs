@@ -164,15 +164,43 @@ namespace MyJsonParser
 
             while (i < input.Length)
             {
-                if (input[i] is '\"' or '"')
+                var indexCharacter = input[i];
+
+                if (indexCharacter is '"')
                 {
                     i++;
                     break;
                 }
 
-                if (input[i] is '\\' or '\t' or '\n')
+                if (indexCharacter is '\t' or '\n')
                 {
                     throw new InvalidOperationException("Invalid Token");
+                }
+
+                if(indexCharacter is '\"')
+                {
+                    keyVal += "\"";
+                    i++;
+                    continue;
+                }
+
+                if (indexCharacter is '\\')
+                {
+
+                    int increment = 2;
+                    var peek = input[i + 1];
+
+                    keyVal += peek switch
+                    {
+                        '"' or 'b' or 't' or '\\' or 'f' or 'n' or 'r' or '/' => $"{indexCharacter}{peek}",
+                        'u' => $"{indexCharacter}{peek}{GetHex(input.Substring(i + 2, 4), out increment)}",
+                        _ => throw new InvalidOperationException("Invalid Escape Character Usage")
+                    };
+                  
+                    Console.WriteLine(keyVal.Length);
+
+                    i += increment;
+                    continue;
                 }
 
                 keyVal += input[i++];
@@ -195,6 +223,21 @@ namespace MyJsonParser
             }
 
             return (keyVal, i - position);
+        }
+
+        private static object GetHex(string hex, out int increment)
+        {
+            const string hexChars = "0123456789ABCDEFabcdef";
+            for(int i = 0; i< hex.Length; i++)
+            {
+                if (!hexChars.Contains(hex[i]))
+                {
+                    throw new InvalidOperationException("Invalid Hex with escape Character!");
+                }
+            }
+
+            increment = 6;
+            return hex;
         }
 
         private static (object?[], int) ParseArray(string input, int position, int initialDeepness)
